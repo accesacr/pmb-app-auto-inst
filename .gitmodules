@@ -1,0 +1,3 @@
+[submodule "PorMiBarrioAPPs"]
+	path = PorMiBarrioAPPs
+	url = https://github.com/datauy/PorMiBarrioAPPs.git
