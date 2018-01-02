@@ -73,7 +73,20 @@ RUN bower install ionic-cache-src --save
 
 RUN gulp --build
 
+USER root
+RUN chown -R node .
+
+USER node
+
+# Fix some broken references
+RUN mkdir www/lib/ionic/release
+RUN cp -R www/lib/ionic/js www/lib/ionic/release/js
+
+# Define the script we want run once the container boots
+# Use the "exec" form of CMD so our script shuts down gracefully on SIGTERM (i.e. `docker stop`)
 # RUN ionic serve
+CMD ["ionic", "serve"]
+
 
 
 
