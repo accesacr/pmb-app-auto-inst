@@ -9,7 +9,7 @@
 #  volumes:
 #    - postgres-volume:/var/lib/postgresql/data
 
-# service configuration for our dockerized Rails app
+# service configuration for our dockerized PMB app
 app:
 
   # use the Dockerfile next to this file
@@ -19,15 +19,14 @@ app:
 #  links:
 #    - database
 
-  # expose the port we configured Unicorn to bind to
+  # expose ionic's port
   ports:
     - "80:3001"
     - "8100:3002"
-    - "3002:8100"
     
   # map our application source code, in full, to the application root of our container
   volumes:
-    - node-volume:/home/PorMiBarrioAPPs
+    - node-volume:/home/pormibarrio/
     
   
 
