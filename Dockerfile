@@ -61,21 +61,19 @@ RUN npm link angular
 # Change to Docker's node user, appropiate for continuing installing
 USER node
 
+# Adding to the bower.json dependecies and resolutions sections so that installation doesn't fail in non-interactive mode
+RUN sed -i '4 s/1.1.0/1.2.1/' bower.json
+RUN sed -i '5 s/}/,"angular":"1.4.14"}/' bower.json
+RUN sed -i '39 s/}/,"angular":"1.4.14"}/' bower.json
+
 RUN bower install --save
 RUN bower install pouchdb --save
 RUN bower install pouchdb-collate --save
-
-USER root 
-
-RUN chown -R node ../PorMiBarrioAPPs
-
-USER node
-
 RUN bower install ionic-cache-src --save
 
 RUN gulp --build
 
-#RUN ionic serve
+# RUN ionic serve
 
 
 
