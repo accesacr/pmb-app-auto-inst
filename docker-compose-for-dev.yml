@@ -23,7 +23,9 @@ app:
   ports:
     - "3002:8100"
     
-  
+  # map our application source code, in full, to the application root of our container
+  volumes:
+    - ./contained-app-folder:/home/node/exposed-app/
     
   
 

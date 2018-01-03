@@ -2,26 +2,21 @@
 FROM node
 
 # Install essential Linux packages
-RUN apt-get update -qq && apt-get install -y build-essential
+RUN apt-get update -qq && apt-get install -y build-essential git
 
-# Set our working directory inside the image
-WORKDIR /home
+# Get app's source code
+RUN mkdir -p /home/node/app
+COPY . /home/node/app
 
-# Create a custom non-root user for PMB
-RUN useradd -ms /bin/bash pormibarrio
-
-# Copy the PMB-APP source code into place
-RUN mkdir -p /home/pormibarrio
-COPY . /home/pormibarrio
-
-# Chance folder owner
-RUN chown -R node /home/pormibarrio/
-
-# Declare PMB-APP root folder
-ENV PMB_ROOT /home/pormibarrio/PorMiBarrioAPPs
+# This folder if it exists should be removed
+RUN if test -d "/home/node/app/contained-app-folder"; \
+	then rm -R /home/node/app/contained-app-folder; fi
+# If the copy didn't brought the source code, download the source code from github directly
+RUN if ! test -d "/home/node/app/PorMiBarrioAPPs"; \
+	then git clone --recursive https://github.com/datauy/PorMiBarrioAPPs.git /home/node/app/PorMiBarrioAPPs; fi
 
 # Move to the repos folder
-WORKDIR $PMB_ROOT
+WORKDIR /home/node/app/PorMiBarrioAPPs
 
 # Update the ionic config file name
 RUN cp ionic.project ionic.config.json
@@ -29,14 +24,6 @@ RUN cp ionic.project ionic.config.json
 # Switched this yarn instead of npm because of this issue
 # https://github.com/npm/npm/issues/17851
 # (got there from here https://github.com/nodejs/docker-node/issues/423)
-# NPM to install and provision source code
-# RUN chown -R node ../PorMiBarrioAPPs
-# RUN npm install
-# RUN npm install -g cordova
-# RUN npm install -g bower
-# RUN npm install -g gulp
-
-# RUN yarn install
 RUN yarn global add cordova
 RUN yarn global add ionic@1.7.11
 RUN yarn global add bower
@@ -58,6 +45,9 @@ RUN npm link gulp-angular-templatecache
 RUN npm link gulp-header
 RUN npm link angular
 
+# Chance folder owner
+RUN chown -R node /home/node
+
 # Change to Docker's node user, appropiate for continuing installing
 USER node
 
@@ -73,20 +63,11 @@ RUN bower install ionic-cache-src --save
 
 RUN gulp --build
 
-USER root
-RUN chown -R node .
-
-USER node
-
 # Fix some broken references
 RUN mkdir www/lib/ionic/release
 RUN cp -R www/lib/ionic/js www/lib/ionic/release/js
 
 # Define the script we want run once the container boots
 # Use the "exec" form of CMD so our script shuts down gracefully on SIGTERM (i.e. `docker stop`)
-# RUN ionic serve
-CMD ["ionic", "serve"]
-
-
-
+CMD ["sh", "/home/node/app/auto-executed-within-container-when-starting.sh"]
 
