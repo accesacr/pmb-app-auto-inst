@@ -22,6 +22,8 @@ app:
   # expose ionic's port
   ports:
     - "3002:8100"
+    - "3003:53703"
+    - "3004:35729"
     
   # map our application source code, in full, to the application root of our container
   volumes:
